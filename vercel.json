@@ -3,13 +3,28 @@
     "builds": [
       {
         "src": "pdf_chatbot/wsgi.py",
+        "use": "@vercel/python",
+        "config": { "maxLambdaSize": "50mb" }
+      },
+      {
+        "src": "pdf_chatbot/manage.py",
         "use": "@vercel/python"
       }
     ],
     "routes": [
       {
+        "src": "/static/(.*)",
+        "dest": "/static/$1"
+      },
+      {
         "src": "/(.*)",
         "dest": "pdf_chatbot/wsgi.py"
       }
-    ]
+    ],
+    "functions": {
+      "api/*.py": {
+        "runtime": "python3.9"
+      }
+    }
   }
+  
