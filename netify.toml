@@ -1,0 +1,8 @@
+[build]
+  base = "/"
+  publish = "staticfiles"
+  command = "python3 manage.py collectstatic --noinput && python3 manage.py migrate && gunicorn pdf_chatbot.wsgi"
+
+[dev]
+  command = "python3 manage.py runserver"
+  port = 8000
