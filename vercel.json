@@ -19,6 +19,10 @@
       "src": "/(.*)",
       "dest": "pdf_chatbot/wsgi.py"
     }
-  ]
+  ],
+  "env": {
+    "DJANGO_SETTINGS_MODULE": "pdf_chatbot.settings",
+    "PYTHONPATH": "."
+  }
 }
 
