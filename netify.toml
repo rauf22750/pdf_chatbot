@@ -5,4 +5,4 @@
 
 [dev]
   command = "python3 manage.py runserver"
-  
+    port = 8000
