@@ -15,4 +15,5 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pdf_chatbot.settings')
 
 application = get_wsgi_application()
 
-
+# Add this for Vercel
+app = application
