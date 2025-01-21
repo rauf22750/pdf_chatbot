@@ -14,6 +14,7 @@ ALLOWED_HOSTS = [
     '*',
     '.vercel.app',
     '.now.sh',
+    'https://pdf-chatbot-tjy3.vercel.app/',
 ]
 
 # Application definition
