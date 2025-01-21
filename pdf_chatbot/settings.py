@@ -15,7 +15,8 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     '.ngrok-free.app',
     '572e-39-37-163-180.ngrok-free.app',
-    '.vercel.app'
+    '.vercel.app',
+    '*'
 ]
 
 # Application definition
@@ -131,7 +132,8 @@ CSRF_TRUSTED_ORIGINS = [
     'https://localhost:8000',
     'http://127.0.0.1:8000',
     'https://127.0.0.1:8000',
-    'https://pdf-chatbot.vercel.app/'
+    'https://pdf-chatbot.vercel.app/',
+    'https://multi-pdf-chatbot.netlify.app/'
 ]
 
 # Security settings
