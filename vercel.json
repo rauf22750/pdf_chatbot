@@ -1,5 +1,4 @@
 {
-  "version": 2,
   "builds": [
     {
       "src": "pdf_chatbot/wsgi.py",
@@ -17,8 +16,10 @@
       "dest": "pdf_chatbot/wsgi.py"
     }
   ],
-  "env": {
-    "DJANGO_SETTINGS_MODULE": "pdf_chatbot.settings"
+  "build": {
+    "env": {
+      "DJANGO_SETTINGS_MODULE": "pdf_chatbot.settings"
+    }
   }
 }
 
