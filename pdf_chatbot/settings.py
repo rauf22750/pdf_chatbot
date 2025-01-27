@@ -21,6 +21,7 @@ ALLOWED_HOSTS = [
     '572e-39-37-163-180.ngrok-free.app',
     'multi-pdf-chatbot.netlify.app',
     '.vercel.app',
+    '*',
 ]
 
 if os.environ.get('ALLOWED_HOSTS'):
@@ -76,7 +77,7 @@ DATABASES = {
         'NAME': config('DB_NAME'),
         'USER': config('DB_USER'),
         'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST', default='127.0.0.1'),
+        'HOST': config('DB_HOST',),
         'PORT': config('DB_PORT', default='5432'),
     }
 }
