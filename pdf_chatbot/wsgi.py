@@ -1,13 +1,16 @@
 import os
 from django.core.wsgi import get_wsgi_application
-from django.core.management import execute_from_command_line
+
+print("WSGI application starting...")
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pdf_chatbot.settings')
 
-# Collect static files
-execute_from_command_line(['manage.py', 'collectstatic', '--noinput'])
+try:
+    application = get_wsgi_application()
+    print("WSGI application loaded successfully.")
+except Exception as e:
+    print(f"WSGI error: {e}")
 
-application = get_wsgi_application()
 app = application
 
 
