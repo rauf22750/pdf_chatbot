@@ -1,12 +1,12 @@
 import os
 from pathlib import Path
 import dj_database_url
-
+from dotenv import load_dotenv
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-DJANGO_SECRET_KEY='218c8992941d1b6e8fc0edfb3376e2d0dff7a18f'
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -58,12 +58,12 @@ TEMPLATES = [
 WSGI_APPLICATION = 'pdf_chatbot.wsgi.application'
 
 # Database
-DATABASE_URL='postgresql://postgres:xNtJNnerrCafobStUZXyVsvEIyGfEPDd@viaduct.proxy.rlwy.net:12511/railway'
 DATABASES = {
-    
-    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'), conn_max_age=600)
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL'),  # Fetch DATABASE_URL from environment
+        conn_max_age=600,  # Optional: Keeps connections open longer
+    )
 }
-
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -108,6 +108,5 @@ LOGIN_REDIRECT_URL = 'chat'
 LOGOUT_REDIRECT_URL = 'login'
 
 # Groq API key
-GROQ_API_KEY='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'
 GROQ_API_KEY = os.environ.get('GROQ_API_KEY')
 
