@@ -16,12 +16,13 @@
   ],
   "routes": [
     {
-      "src": "/static/",
+      "src": "/static/(.*)",
       "dest": "/static/$1"
     },
     {
-      "src": "",
+      "src": "/(.*)",
       "dest": "pdf_chatbot/wsgi.py"
     }
   ]
 }
+
