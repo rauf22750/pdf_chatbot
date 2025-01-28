@@ -10,7 +10,7 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'your-default-secret-key')
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
@@ -18,7 +18,7 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 # Allowed hosts (restrict this in production)
 ALLOWED_HOSTS = [
     '*',  # Allow all hosts (not recommended for production)
-    'pdf-chatbot-rauf22750-gmailcoms-projects.vercel.app',
+    'pdf-chatbot-drab.vercel.app',
 ]
 
 # Application definition
@@ -118,5 +118,5 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     CSRF_TRUSTED_ORIGINS = [
-        'https://pdf-chatbot-rauf22750-gmailcoms-projects.vercel.app',
+        'https://pdf-chatbot-drab.vercel.app',
     ]
