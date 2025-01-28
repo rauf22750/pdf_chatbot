@@ -21,7 +21,6 @@ ALLOWED_HOSTS = [
     '.ngrok-free.app',
     '572e-39-37-163-180.ngrok-free.app',
     '.vercel.app',
-    'pdf-chatbot-drab.vercel.app',
     '*',
 ]
 
