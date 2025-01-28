@@ -1,30 +1,18 @@
 import os
 from pathlib import Path
-from dotenv import load_dotenv
-from decouple import config
 import dj_database_url
-
-# Load environment variables from .env file
-load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
+DJANGO_SECRET_KEY='218c8992941d1b6e8fc0edfb3376e2d0dff7a18f'
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '.ngrok-free.app',
-    '572e-39-37-163-180.ngrok-free.app',
-    '.vercel.app',
-    '*',
-]
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.vercel.app', '.now.sh']
 
 # Application definition
 INSTALLED_APPS = [
@@ -70,22 +58,11 @@ TEMPLATES = [
 WSGI_APPLICATION = 'pdf_chatbot.wsgi.application'
 
 # Database
-
-
+DATABASE_URL='postgresql://postgres:xNtJNnerrCafobStUZXyVsvEIyGfEPDd@viaduct.proxy.rlwy.net:12511/railway'
 DATABASES = {
-    'default': dj_database_url.config(default=os.getenv('DATABASE_URL'), conn_max_age=600)
+    
+    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'), conn_max_age=600)
 }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': config('DB_NAME'),
-#         'USER': config('DB_USER'),
-#         'PASSWORD': config('DB_PASSWORD'),
-#         'HOST': config('DB_HOST',),
-#         'PORT': config('DB_PORT', default='5432'),
-#     }
-# }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -131,5 +108,6 @@ LOGIN_REDIRECT_URL = 'chat'
 LOGOUT_REDIRECT_URL = 'login'
 
 # Groq API key
+GROQ_API_KEY='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'
 GROQ_API_KEY = os.environ.get('GROQ_API_KEY')
 

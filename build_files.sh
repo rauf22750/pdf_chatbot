@@ -1,8 +1,4 @@
-#!/bin/bash
-#!/bin/bash
-echo "Installing dependencies..."
-python3.9 -m pip install --upgrade pip
-python3.9 -m pip install -r requirements.txt
-echo "Collecting static files..."
+# build_files.sh
+pip install -r requirements.txt
 python3.9 manage.py collectstatic --noinput
-echo "Build completed."
+
