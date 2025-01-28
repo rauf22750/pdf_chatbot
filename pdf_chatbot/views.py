@@ -10,6 +10,11 @@ from .utils import process_multiple_pdfs
 
 logger = logging.getLogger(__name__)
 
+from django.http import HttpResponse
+
+def index(request):
+    return HttpResponse("Hello, World!")
+
 @login_required
 def chat_view(request):
     pdf_uploads = PDFUpload.objects.filter(user=request.user) if request.user.is_pdf_uploader else PDFUpload.objects.all()
