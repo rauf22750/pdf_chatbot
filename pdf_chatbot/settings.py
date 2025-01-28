@@ -14,13 +14,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '.ngrok-free.app',
     '572e-39-37-163-180.ngrok-free.app',
-    'pdf-chatbot-eight.vercel.app',
     '.vercel.app',
+    'pdf-chatbot-drab.vercel.app',
     '*',
 ]
 
