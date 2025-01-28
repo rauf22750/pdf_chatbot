@@ -24,8 +24,7 @@ ALLOWED_HOSTS = [
     '*',
 ]
 
-if os.environ.get('ALLOWED_HOSTS'):
-    ALLOWED_HOSTS += os.environ.get('ALLOWED_HOSTS').split(',')
+
 
 # Application definition
 INSTALLED_APPS = [
