@@ -1,28 +1,16 @@
 {
-  "version": 2,
   "builds": [
     {
       "src": "pdf_chatbot/wsgi.py",
-      "use": "@vercel/python",
-      "config": { "runtime": "python3.9" }
-    },
-    {
-      "src": "build_files.sh",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "staticfiles"
-      }
+      "use": "@vercel/python"
     }
   ],
   "routes": [
-    {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
-    },
     {
       "src": "/(.*)",
       "dest": "pdf_chatbot/wsgi.py"
     }
   ]
 }
+
 
