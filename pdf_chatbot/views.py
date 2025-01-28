@@ -12,6 +12,8 @@ logger = logging.getLogger(__name__)
 
 from django.http import HttpResponse
 
+def index(request):
+    return HttpResponse("Hello, World!")
 
 @login_required
 def chat_view(request):
