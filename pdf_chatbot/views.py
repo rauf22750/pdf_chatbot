@@ -4,8 +4,8 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
-from .forms import CustomUserCreationForm, PDFUploadForm
-from .models import PDFUpload, ChatMessage
+from accounts.forms import CustomUserCreationForm, PDFUploadForm
+from accounts.models import PDFUpload, ChatMessage
 from .utils import process_multiple_pdfs
 
 logger = logging.getLogger(__name__)
