@@ -20,7 +20,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     '.ngrok-free.app',
     '572e-39-37-163-180.ngrok-free.app',
-    'multi-pdf-chatbot.netlify.app',
+    'pdf-chatbot.vercel.app',
     '.vercel.app',
     '*',
 ]
