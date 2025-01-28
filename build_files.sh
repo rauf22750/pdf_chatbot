@@ -1,16 +1,24 @@
 #!/bin/bash
-set -e  # Exit on error
+set -e  # Exit on any error
 
-echo "Installing dependencies..."
+echo "Ensuring pip is installed..."
+python3.9 -m ensurepip --upgrade
+if [ $? -ne 0 ]; then
+  echo "Failed to install pip!"
+  exit 1
+fi
+
+echo "Upgrading pip..."
 python3.9 -m pip install --upgrade pip
 if [ $? -ne 0 ]; then
   echo "Failed to upgrade pip!"
   exit 1
 fi
 
+echo "Installing dependencies..."
 python3.9 -m pip install -r requirements.txt
 if [ $? -ne 0 ]; then
-  echo "Failed to install dependencies from requirements.txt!"
+  echo "Failed to install dependencies!"
   exit 1
 fi
 
