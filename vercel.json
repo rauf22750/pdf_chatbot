@@ -6,34 +6,18 @@
       "use": "@vercel/python",
       "config": {
         "maxLambdaSize": "50mb",
-        "runtime": "python3.10"
-      }
-    },
-    {
-      "src": "build.sh",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "staticfiles"
+        "runtime": "python3.9"
       }
     }
   ],
   "routes": [
-    {
-      "src": "/static/(.*)",
-      "dest": "/staticfiles/$1"
-    },
     {
       "src": "/(.*)",
       "dest": "pdf_chatbot/wsgi.py"
     }
   ],
   "env": {
-    "DJANGO_SETTINGS_MODULE": "pdf_chatbot.settings",
-    "DATABASE_URL": "postgresql://postgres:xNtJNnerrCafobStUZXyVsvEIyGfEPDd@viaduct.proxy.rlwy.net:12511/railway",
-    "DJANGO_SECRET_KEY": "218c8992941d1b6e8fc0edfb3376e2d0dff7a18f",
-    "DEBUG": "False",
-    "GROQ_API_KEY":"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",
-    "ALLOWED_HOSTS": "['*']"
+    "DJANGO_SETTINGS_MODULE": "pdf_chatbot.settings"
   },
-  "buildCommand": "pip install -r requirements.txt && chmod +x build.sh && ./build.sh"
+  "buildCommand": "pip install -r requirements.txt && python manage.py migrate"
 }
