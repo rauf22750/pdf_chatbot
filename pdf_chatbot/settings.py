@@ -18,6 +18,8 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 # Allowed hosts (restrict this in production)
 ALLOWED_HOSTS = [
     '*',  # Allow all hosts (not recommended for production)
+    '127.0.0.1',
+    'localhost',
     'pdf-chatbot-drab.vercel.app',
 ]
 
@@ -110,13 +112,14 @@ LOGOUT_REDIRECT_URL = 'login'
 GROQ_API_KEY = os.environ.get('GROQ_API_KEY')
 
 # Security settings (for production)
-if not DEBUG:
-    SECURE_HSTS_SECONDS = 31536000  # 1 year
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    CSRF_TRUSTED_ORIGINS = [
+# if not DEBUG:
+#     SECURE_HSTS_SECONDS = 31536000  # 1 year
+#     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+#     SECURE_HSTS_PRELOAD = True
+#     SECURE_SSL_REDIRECT = True
+#     SESSION_COOKIE_SECURE = True
+#     CSRF_COOKIE_SECURE = True
+CSRF_TRUSTED_ORIGINS = [
         'https://pdf-chatbot-drab.vercel.app',
+        'https://127.0.0.1:8000/',
     ]
