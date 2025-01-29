@@ -2,11 +2,11 @@
   "version": 2,
   "builds": [
     {
-      "src": "manage.py",
+      "src": "pdf_chatbot/wsgi.py",
       "use": "@vercel/python",
       "config": {
         "maxLambdaSize": "50mb",
-        "runtime": "python3.9"
+        "runtime": "python3.10"
       }
     },
     {
@@ -20,11 +20,11 @@
   "routes": [
     {
       "src": "/static/(.*)",
-      "dest": "staticfiles/$1"
+      "dest": "/staticfiles/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "manage.py"
+      "dest": "pdf_chatbot/wsgi.py"
     }
   ],
   "env": {
