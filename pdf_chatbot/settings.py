@@ -3,24 +3,21 @@ from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
 load_dotenv()
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-# Allowed hosts (restrict this in production)
 ALLOWED_HOSTS = [
-    '*',  # Allow all hosts (not recommended for production)
-    '127.0.0.1',
     'localhost',
+    '127.0.0.1',
+    'pdf-chatbot-drab.up.railway.app',
     'pdf-chatbot-drab.vercel.app',
+    '.vercel.app',
+    '.railway.app',
 ]
 
 # Application definition
@@ -37,7 +34,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # For serving static files
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -66,15 +62,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'pdf_chatbot.wsgi.application'
 
-# Database configuration (PostgreSQL on Railway)
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL'),  # Use DATABASE_URL from Railway
+        default=os.environ.get('DATABASE_URL'),
         conn_max_age=600,
     )
 }
 
-# Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -82,40 +76,27 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
+# We're not using static files, but Django requires this setting
+STATIC_URL = '/static/'
 
-
-# Media files (uploads)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Custom user model
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
-# Login and logout redirects
 LOGIN_REDIRECT_URL = 'chat'
 LOGOUT_REDIRECT_URL = 'login'
 
-# Groq API key
 GROQ_API_KEY = os.environ.get('GROQ_API_KEY')
 
-# Security settings (for production)
-# if not DEBUG:
-#     SECURE_HSTS_SECONDS = 31536000  # 1 year
-#     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-#     SECURE_HSTS_PRELOAD = True
-#     SECURE_SSL_REDIRECT = True
-#     SESSION_COOKIE_SECURE = True
-#     CSRF_COOKIE_SECURE = True
 CSRF_TRUSTED_ORIGINS = [
-        'https://pdf-chatbot-drab.vercel.app',
-        'https://127.0.0.1:8000/',
-    ]
+    'https://pdf-chatbot-drab.vercel.app',
+    'https://pdf-chatbot-drab.up.railway.app',
+]

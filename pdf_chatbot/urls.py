@@ -21,12 +21,19 @@ from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from pdf_chatbot import views
 
+from django.contrib import admin
+from django.urls import path, include
+from pdf_chatbot.views import chat_api, upload_pdf, chat_view, register
+from django.conf import settings
+from django.conf.urls.static import static
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.chat_view, name='chat'),
-    path('register/', views.register, name='register'),
-    path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('register/', register, name='register'),
+    path('', chat_view, name='chat'),
+    path('api/chat', chat_api, name='chat_api'),
+    path('api/upload', upload_pdf, name='upload_pdf'),
 ]
 
 if settings.DEBUG:
