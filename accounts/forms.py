@@ -11,4 +11,3 @@ class PDFUploadForm(forms.ModelForm):
     class Meta:
         model = PDFUpload
         fields = ('pdf_file',)
-
