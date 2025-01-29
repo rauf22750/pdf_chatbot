@@ -32,7 +32,8 @@
     "DATABASE_URL": "postgresql://postgres:xNtJNnerrCafobStUZXyVsvEIyGfEPDd@viaduct.proxy.rlwy.net:12511/railway",
     "DJANGO_SECRET_KEY": "218c8992941d1b6e8fc0edfb3376e2d0dff7a18f",
     "DEBUG": "False",
-    "GROQ_API_KEY":"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"
+    "GROQ_API_KEY":"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",
+    "ALLOWED_HOSTS": "['*']"
   },
   "buildCommand": "pip install -r requirements.txt && chmod +x build.sh && ./build.sh"
 }
