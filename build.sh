@@ -1,19 +1,18 @@
 #!/bin/bash
 
-# Ensure pip is installed
-echo "Checking pip installation..."
+echo "Ensuring pip is installed..."
 python -m ensurepip --default-pip
 python -m pip install --upgrade pip
 
-# Install dependencies
-echo "Installing dependencies from requirements.txt..."
+echo "Installing dependencies..."
 pip install -r requirements.txt
 
-# Apply database migrations
-echo "Applying migrations..."
+echo "Running migrations..."
 python manage.py migrate
 
-# Collect static files
 echo "Collecting static files..."
+mkdir -p staticfiles  # Ensure the folder exists
 python manage.py collectstatic --noinput
 
+echo "Checking collected files..."
+ls -la staticfiles
