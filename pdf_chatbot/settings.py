@@ -122,7 +122,7 @@ LOGIN_REDIRECT_URL = 'chat'
 LOGOUT_REDIRECT_URL = 'login'
 
 # Groq API key
-GROQ_API_KEY = "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"  # Replace with your actual Groq API key
+GROQ_API_KEY = "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"  # Replace with your actual Groq API key
 
 # CSRF settings
 CSRF_TRUSTED_ORIGINS = [
