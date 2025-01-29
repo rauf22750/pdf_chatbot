@@ -1,9 +1,19 @@
 #!/bin/bash
-#!/bin/bash
-echo "Installing dependencies..."
-python3.9 -m pip install --upgrade pip
-python3.9 -m pip install -r requirements.txt
+
+# Ensure pip is installed
+echo "Checking pip installation..."
+python -m ensurepip --default-pip
+python -m pip install --upgrade pip
+
+# Install dependencies
+echo "Installing dependencies from requirements.txt..."
+pip install -r requirements.txt
+
+# Apply database migrations
+echo "Applying migrations..."
+python manage.py migrate
+
+# Collect static files
 echo "Collecting static files..."
-python3.9 manage.py collectstatic --noinput
-echo "Build completed."
+python manage.py collectstatic --noinput
 
