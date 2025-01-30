@@ -92,4 +92,3 @@ def send_text_to_model(pdf_summaries, question, context):
     except Exception as e:
         logger.error(f"Error while interacting with the model: {str(e)}")
         return f"Error while interacting with the model: {str(e)}"
-
