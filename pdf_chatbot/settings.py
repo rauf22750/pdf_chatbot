@@ -141,6 +141,7 @@ CSRF_TRUSTED_ORIGINS = [
     'https://pdf-chatbot.vercel.app/'
 ]
 
+
 # Security settings
 CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SECURE = False
