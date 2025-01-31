@@ -30,11 +30,11 @@
         {% if user.is_pdf_uploader %}
             <div class="mb-8">
                 <h3 class="text-xl font-bold mb-4">Upload PDF</h3>
-                <form method="post" enctype="multipart/form-data" class="space-y-4">
+                <form id="pdf-upload-form" method="post" enctype="multipart/form-data" class="space-y-4">
                     {% csrf_token %}
                     <div class="form-group">
-                        <label for="id_pdf_file" class="block text-sm font-semibold mb-2">Choose PDF File</label>
-                        <input type="file" name="pdf_file" id="id_pdf_file" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required>
+                        <label for="id_file" class="block text-sm font-semibold mb-2">Choose PDF File</label>
+                        <input type="file" name="file" id="id_file" accept=".pdf" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required>
                     </div>
                     <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                         Upload PDF
@@ -45,13 +45,13 @@
 
         <div>
             <h3 class="text-xl font-bold mb-4">Available PDFs</h3>
-            <ul class="space-y-2">
-                {% for pdf in pdf_uploads %}
+            <ul id="pdf-list" class="space-y-2">
+                {% for pdf in pdfs %}
                     <li class="bg-gray-50 p-3 rounded shadow hover:shadow-md flex items-center justify-between">
                         <span class="text-blue-500 font-bold truncate">
-                            {{ pdf.pdf_file.name }}
+                            {{ pdf.file.name }}
                         </span>
-                        <a href="{{ pdf.pdf_file.url }}" target="_blank" class="text-sm text-blue-600 hover:underline">
+                        <a href="{{ pdf.file.url }}" target="_blank" class="text-sm text-blue-600 hover:underline">
                             Open
                         </a>
                     </li>
@@ -84,13 +84,13 @@
             
             <form id="chat-form" method="post" class="space-y-4">
                 {% csrf_token %}
-                <select name="pdf_id" id="pdf-select" class="block w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5">
+                {% comment %} <select name="pdf_id" id="pdf-select" class="block w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5">
                     <option value="all">All PDFs</option>
-                    {% for pdf in pdf_uploads %}
-                        <option value="{{ pdf.id }}">{{ pdf.pdf_file.name }}</option>
+                    {% for pdf in pdfs %}
+                        <option value="{{ pdf.id }}">{{ pdf.file.name }}</option>
                     {% endfor %}
-                </select>
-                <textarea name="user_input" id="user-input" class="block w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5" rows="4" placeholder="Enter your question..."></textarea>
+                </select> {% endcomment %}
+                <textarea name="message" id="user-input" class="block w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5" rows="4" placeholder="Enter your question..."></textarea>
                 <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                     Send
                 </button>
@@ -105,10 +105,12 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const chatForm = document.getElementById('chat-form');
+    const pdfUploadForm = document.getElementById('pdf-upload-form');
     const userInput = document.getElementById('user-input');
     const pdfSelect = document.getElementById('pdf-select');
     const chatResponse = document.getElementById('chat-response');
     const chatHistory = document.getElementById('chat-history');
+    const pdfList = document.getElementById('pdf-list');
 
     function showTypingIndicator() {
         const typingDiv = document.createElement('div');
@@ -145,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Show typing indicator
         const typingIndicator = showTypingIndicator();
         
-        fetch(chatForm.action, {
+        fetch('', {
             method: 'POST',
             body: formData,
             headers: {
@@ -191,6 +193,52 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // PDF Upload Form Submission
+    if (pdfUploadForm) {
+        pdfUploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(pdfUploadForm);
+            
+            fetch('', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    alert('PDF uploaded successfully!');
+                    // Add the new PDF to the list
+                    const newPdf = document.createElement('li');
+                    newPdf.className = 'bg-gray-50 p-3 rounded shadow hover:shadow-md flex items-center justify-between';
+                    newPdf.innerHTML = `
+                        <span class="text-blue-500 font-bold truncate">
+                            ${data.pdf_name}
+                        </span>
+                        <a href="${data.pdf_url}" target="_blank" class="text-sm text-blue-600 hover:underline">
+                            Open
+                        </a>
+                    `;
+                    pdfList.appendChild(newPdf);
+                    
+                    // Add the new PDF to the select options
+                    const option = document.createElement('option');
+                    option.value = data.pdf_id;
+                    option.textContent = data.pdf_name;
+                    pdfSelect.appendChild(option);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while uploading the PDF.');
+            });
+        });
+    }
+
     // Submit form when Enter key is pressed (without Shift)
     userInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -201,3 +249,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
+

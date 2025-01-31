@@ -1,29 +1,24 @@
-from django.db import models
-
-# Create your models here.
 from django.contrib.auth.models import AbstractUser
-from django.db import models
 from django.db import models
 
 class CustomUser(AbstractUser):
-    is_pdf_uploader = models.BooleanField(default=False)
+    is_pdf_uploader = models.BooleanField(default=True)
 
-class PDFUpload(models.Model):
+class PDFDocument(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    pdf_file = models.FileField(upload_to='pdfs/')
+    file = models.FileField(upload_to='pdfs/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
-
+    
     def __str__(self):
-        return f"{self.user.username} - {self.pdf_file.name}"
+        return f"{self.file.name} - {self.user.username}"
 
 class ChatMessage(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    pdf = models.ForeignKey(PDFUpload, on_delete=models.CASCADE, null=True, blank=True)
+    pdf = models.ForeignKey(PDFDocument, on_delete=models.SET_NULL, null=True)
     message = models.TextField()
     response = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"{self.user.username} - {self.timestamp}"
-
+    class Meta:
+        ordering = ['timestamp']
 
