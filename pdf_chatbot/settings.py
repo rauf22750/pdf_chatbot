@@ -61,12 +61,24 @@ TEMPLATES = [
 WSGI_APPLICATION = 'pdf_chatbot.wsgi.application'
 
 # Database settings (SQLite or PostgreSQL)
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'railway',  # Database name
+        'USER': 'postgres',  # Username
+        'PASSWORD': 'QRSaWneUcHEHPJqhZFNwvikJMEbpzvXa',  # Replace with your actual password
+        'HOST': 'autorack.proxy.rlwy.net',  # Remote host
+        'PORT': '13367',  # Port number
     }
 }
+
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
