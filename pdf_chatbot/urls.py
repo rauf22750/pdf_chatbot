@@ -23,10 +23,10 @@ from django.contrib.auth import views as auth_views
 from pdf_chatbot import views
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.chat_view, name='chat'),
+    path('login/', views.login_view, name='login'),
     path('register/', views.register, name='register'),
-    path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('', views.chat_view, name='chat'),
+    path('logout/', views.logout_view, name='logout'),
 ]
 
 

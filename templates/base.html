@@ -9,8 +9,9 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body class="bg-gray-100 h-screen flex flex-col">
+
     <!-- Navigation Bar -->
-    <nav class="bg-blue-500 p-4 text-white shadow">
+    <nav class="bg-blue-600 p-4 text-white shadow-md">
         <div class="container mx-auto flex justify-between items-center">
             <a href="{% url 'chat' %}" class="text-2xl font-bold">PDF Chatbot</a>
             <div>
@@ -18,11 +19,11 @@
                     <span class="mr-4">Welcome, {{ user.username }}</span>
                     <form method="post" action="{% url 'logout' %}" class="inline">
                         {% csrf_token %}
-                        <button type="submit" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded">Logout</button>
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white">Logout</button>
                     </form>
                 {% else %}
-                    <a href="{% url 'login' %}" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded mr-2">Login</a>
-                    <a href="{% url 'register' %}" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded">Register</a>
+                    <a href="{% url 'login' %}" class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded text-white mr-2">Login</a>
+                    <a href="{% url 'register' %}" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded text-white">Register</a>
                 {% endif %}
             </div>
         </div>
@@ -41,6 +42,7 @@
     </footer>
 
     <script>
+    // CSRF Token Handling for AJAX and forms
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -75,6 +77,7 @@
         });
     });
     </script>
+
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>

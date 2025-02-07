@@ -11,7 +11,7 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Security settings
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-your-secret-key-here')
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 DEBUG = True
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.ngrok-free.app', '.vercel.app']
 
@@ -68,15 +68,20 @@ WSGI_APPLICATION = 'pdf_chatbot.wsgi.application'
 #     }
 # }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'railway',  # Database name
+#         'USER': 'postgres',  # Username
+#         'PASSWORD': 'QRSaWneUcHEHPJqhZFNwvikJMEbpzvXa',  # Replace with your actual password
+#         'HOST': 'autorack.proxy.rlwy.net',  # Remote host
+#         'PORT': '13367',  # Port number
+#     }
+# }
+
+# DATABASES Configuration using URL
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'railway',  # Database name
-        'USER': 'postgres',  # Username
-        'PASSWORD': 'QRSaWneUcHEHPJqhZFNwvikJMEbpzvXa',  # Replace with your actual password
-        'HOST': 'autorack.proxy.rlwy.net',  # Remote host
-        'PORT': '13367',  # Port number
-    }
+    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
 }
 
 

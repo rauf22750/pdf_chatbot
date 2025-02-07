@@ -84,12 +84,6 @@
             
             <form id="chat-form" method="post" class="space-y-4">
                 {% csrf_token %}
-                {% comment %} <select name="pdf_id" id="pdf-select" class="block w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5">
-                    <option value="all">All PDFs</option>
-                    {% for pdf in pdfs %}
-                        <option value="{{ pdf.id }}">{{ pdf.file.name }}</option>
-                    {% endfor %}
-                </select> {% endcomment %}
                 <textarea name="message" id="user-input" class="block w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5" rows="4" placeholder="Enter your question..."></textarea>
                 <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                     Send
@@ -105,11 +99,10 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const chatForm = document.getElementById('chat-form');
-    const pdfUploadForm = document.getElementById('pdf-upload-form');
     const userInput = document.getElementById('user-input');
-    const pdfSelect = document.getElementById('pdf-select');
     const chatResponse = document.getElementById('chat-response');
     const chatHistory = document.getElementById('chat-history');
+    const pdfUploadForm = document.getElementById('pdf-upload-form');
     const pdfList = document.getElementById('pdf-list');
 
     function showTypingIndicator() {
@@ -216,37 +209,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     const newPdf = document.createElement('li');
                     newPdf.className = 'bg-gray-50 p-3 rounded shadow hover:shadow-md flex items-center justify-between';
                     newPdf.innerHTML = `
-                        <span class="text-blue-500 font-bold truncate">
-                            ${data.pdf_name}
-                        </span>
-                        <a href="${data.pdf_url}" target="_blank" class="text-sm text-blue-600 hover:underline">
-                            Open
-                        </a>
+                        <span class="text-blue-500 font-bold truncate">${data.pdf_name}</span>
+                        <a href="${data.pdf_url}" target="_blank" class="text-sm text-blue-600 hover:underline">Open</a>
                     `;
                     pdfList.appendChild(newPdf);
-                    
-                    // Add the new PDF to the select options
-                    const option = document.createElement('option');
-                    option.value = data.pdf_id;
-                    option.textContent = data.pdf_name;
-                    pdfSelect.appendChild(option);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred while uploading the PDF.');
+                alert('Error uploading PDF');
             });
         });
     }
-
-    // Submit form when Enter key is pressed (without Shift)
-    userInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            chatForm.dispatchEvent(new Event('submit'));
-        }
-    });
 });
 </script>
 {% endblock %}
-
