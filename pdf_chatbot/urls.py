@@ -15,17 +15,17 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
-from django.contrib.auth import views as auth_views
+from django.contrib.auth import views 
 from pdf_chatbot import views
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.authtoken import views as auth_views
-# from pdf_chatbot import api_views
+from pdf_chatbot import api_views
 urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('register/', views.register, name='register'),
@@ -33,10 +33,11 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     # API endpoints
     path('admin/', admin.site.urls),
-    # path('api/register/', api_views.register_api, name='api_register'),
-    # path('api/login/', api_views.login_api, name='api_login'),
-    # path('api/chat/', api_views.ChatView.as_view(), name='api_chat'),
-    # path('api/upload-pdf/', api_views.PDFUploadView.as_view(), name='api_upload_pdf'),
+    path('api/login/', api_views.login_api, name='login_api'),
+    path('api/register/', api_views.register_api, name='register_api'),
+    path('api/chat/', api_views.chat_api, name='chat_api'),
+    path('api/upload_pdf/', api_views.upload_pdf, name='upload_pdf_api'),
+    path('api/logout/', api_views.logout_api, name='logout_api'),
     
 ]
 
