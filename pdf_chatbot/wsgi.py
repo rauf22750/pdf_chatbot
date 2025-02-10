@@ -8,5 +8,5 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pdf_chatbot.settings')
 execute_from_command_line(['manage.py', 'collectstatic', '--noinput'])
 
 application = get_wsgi_application()
-app = application
+
 
