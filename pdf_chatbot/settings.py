@@ -3,6 +3,7 @@ from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
 import groq
+from datetime import timedelta
 
 # Load environment variables from .env file
 load_dotenv()
@@ -25,12 +26,16 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts',  # Custom app
     'widget_tweaks',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',  # Add this
 ]
 
 # Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # Add this at the top
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -135,3 +140,26 @@ os.makedirs(FAISS_INDEX_DIR, exist_ok=True)
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+
+
+# ... (existing settings)
+
+# Django Rest Framework settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+
+# Token expiration time (optional)
+TOKEN_EXPIRED_AFTER_SECONDS = 86400  # 24 hours
+
+# ... (rest of the settings file)
+

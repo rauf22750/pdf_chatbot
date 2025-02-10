@@ -21,12 +21,23 @@ from django.conf.urls.static import static
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from pdf_chatbot import views
+from django.contrib import admin
+from django.conf import settings
+from django.conf.urls.static import static
+from rest_framework.authtoken import views as auth_views
+from pdf_chatbot import api_views
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('login/', views.login_view, name='login'),
     path('register/', views.register, name='register'),
     path('', views.chat_view, name='chat'),
     path('logout/', views.logout_view, name='logout'),
+    # API endpoints
+    path('admin/', admin.site.urls),
+    path('api/register/', api_views.register_api, name='api_register'),
+    path('api/login/', api_views.login_api, name='api_login'),
+    path('api/chat/', api_views.ChatView.as_view(), name='api_chat'),
+    path('api/upload-pdf/', api_views.PDFUploadView.as_view(), name='api_upload_pdf'),
+    
 ]
 
 
