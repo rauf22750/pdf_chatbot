@@ -1,1 +1,0 @@
-web : gunicorm pdf_chatbot.wsgi
