@@ -14,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Security settings
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-your-secret-key-here')
 DEBUG = False
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.ngrok-free.app', '.vercel.app','*']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.ngrok-free.app', '.vercel.app','*','http://pdfchatbot-production.up.railway.app/']
 
 # Applications definition
 INSTALLED_APPS = [
