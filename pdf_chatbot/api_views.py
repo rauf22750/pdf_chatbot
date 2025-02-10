@@ -18,21 +18,19 @@ logger = logging.getLogger(__name__)
 def login_api(request):
     username = request.data.get('username')
     password = request.data.get('password')
-
+    
     if not username or not password:
+        logger.error("Login failed: Missing username or password")
         return Response({'error': 'Username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
 
     user = authenticate(request, username=username, password=password)
     if user is not None:
-        # Generate authentication token
-        token, created = Token.objects.get_or_create(user=user)
         login(request, user)
-        return Response({
-            'message': 'Login successful',
-            'token': token.key  # Return the token to be used in future requests
-        }, status=status.HTTP_200_OK)
+        return Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
     
+    logger.error(f"Login failed: Invalid credentials for username: {username}")
     return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
 
 
 # Register API
@@ -73,14 +71,54 @@ def register_api(request):
 
 
 # Chat API
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from django.http import JsonResponse
+from .utils import generate_response, process_pdf
+from accounts.models import CustomUser, ChatMessage, PDFDocument
+import logging
+
+logger = logging.getLogger(__name__)
+
+# Chat API (POST for messages, GET for fetching chat history)
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def chat_api(request):
-    if request.method == 'GET':
-        # Retrieve chat history and PDFs associated with the logged-in user
-        chat_history = ChatMessage.objects.filter(user=request.user)
-        pdfs = PDFDocument.objects.filter(user=request.user)
+    if request.method == 'POST':
+        # Get the message from the request data
+        message = request.data.get('message')
 
+        if not message:
+            return Response({'error': 'Message is required'}, status=400)
+
+        try:
+            # Generate the response based on the message
+            response = generate_response(message, request.user)
+
+            # Save the chat message and response to the database
+            chat_message = ChatMessage.objects.create(
+                user=request.user,
+                message=message,
+                response=response
+            )
+
+            return JsonResponse({
+                'response': response,
+                'timestamp': chat_message.timestamp.isoformat()
+            })
+
+        except Exception as e:
+            return JsonResponse({'error': f"Internal Server Error: {str(e)}"}, status=500)
+
+    elif request.method == 'GET':
+        # Fetch all chat history for the authenticated user
+        chat_history = ChatMessage.objects.filter(user=request.user).order_by('-timestamp')
+
+        # If no chat history exists
+        if not chat_history.exists():
+            logger.info(f"User {request.user.username} has no chat history.")
+        
         chat_data = [
             {
                 'message': chat.message,
@@ -90,81 +128,37 @@ def chat_api(request):
             for chat in chat_history
         ]
 
-        pdf_data = [
-            {
-                'pdf_id': pdf.id,
-                'pdf_name': pdf.file.name,
-                'pdf_url': pdf.file.url
-            }
-            for pdf in pdfs
-        ]
+        logger.info(f"Chat history for user {request.user.username}: {chat_data}")
 
-        return Response({
-            'chat_history': chat_data,
-            'pdfs': pdf_data
+        return JsonResponse({
+            'chat_history': chat_data
         })
-
-    elif request.method == 'POST':
-        if 'file' in request.FILES:
-            # PDF file upload
-            pdf = request.FILES['file']
-            try:
-                pdf_doc = PDFDocument.objects.create(user=request.user, file=pdf)
-                process_pdf(pdf_doc)  # Add your PDF processing logic here
-                return Response({
-                    'message': 'PDF uploaded and processed successfully',
-                    'pdf_id': pdf_doc.id,
-                    'pdf_name': pdf_doc.file.name,
-                    'pdf_url': pdf_doc.file.url
-                }, status=status.HTTP_200_OK)
-            except Exception as e:
-                logger.error(f"Error uploading PDF: {str(e)}")
-                return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        else:
-            # Chat message processing
-            message = request.data.get('message')
-            if not message:
-                return Response({'error': 'Message is required'}, status=status.HTTP_400_BAD_REQUEST)
-
-            try:
-                response = generate_response(message, request.user)
-                chat_message = ChatMessage.objects.create(
-                    user=request.user,
-                    message=message,
-                    response=response
-                )
-                return Response({
-                    'response': response,
-                    'timestamp': chat_message.timestamp.isoformat()
-                })
-            except Exception as e:
-                logger.error(f"Error generating response: {str(e)}")
-                return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-# PDF Upload API
+# PDF Upload API (Save PDF and process)
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def upload_pdf(request):
-    if 'file' in request.FILES:
+    if request.method == 'POST' and 'file' in request.FILES:
         pdf_file = request.FILES['file']
+
         try:
+            # Save the PDF document in the model
             pdf_doc = PDFDocument.objects.create(user=request.user, file=pdf_file)
-            process_pdf(pdf_doc)  # Process the PDF if needed
-            return Response({
+
+            # Optionally, process the PDF (e.g., extract text, tables, etc.)
+            process_pdf(pdf_doc)  # Add your PDF processing logic here
+
+            return JsonResponse({
                 'message': 'PDF uploaded successfully!',
                 'pdf_id': pdf_doc.id,
                 'pdf_name': pdf_doc.file.name,
                 'pdf_url': pdf_doc.file.url
-            }, status=status.HTTP_200_OK)
+            }, status=200)
         except Exception as e:
             logger.error(f"Error uploading PDF: {str(e)}")
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return JsonResponse({'error': str(e)}, status=500)
 
     else:
-        return Response({'error': 'No file uploaded or wrong HTTP method'}, status=status.HTTP_400_BAD_REQUEST)
-
+        return JsonResponse({'error': 'No file uploaded or wrong HTTP method'}, status=400)
 
 # Logout API
 @api_view(['POST'])
