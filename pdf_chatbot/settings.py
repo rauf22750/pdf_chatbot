@@ -34,6 +34,9 @@ INSTALLED_APPS = [
 
 # Middleware
 MIDDLEWARE = [
+    # ... other middleware ...
+    'pdf_chatbot.middleware.CSRFExemptMiddleware',  # Add this line
+    # ... other middleware ...
     'django.middleware.security.SecurityMiddleware', 
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -163,6 +166,14 @@ REST_FRAMEWORK = {
 
 # Token expiration time (optional)
 TOKEN_EXPIRED_AFTER_SECONDS = 86400  # 24 hours
+CORS_ALLOW_ALL_ORIGINS = True  # For development only, restrict this in production
+# Add this setting to exempt CSRF checks for certain URLs
+CSRF_EXEMPT_URLS = [
+    r'^api/login/$',
+    r'^api/register/$',
+    r'^api/chat/$',
+    r'^api/upload_pdf/$',
 
-# ... (rest of the settings file)
+    # Add other API URLs that should be exempt from CSRF
+]
 
