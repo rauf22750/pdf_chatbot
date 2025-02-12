@@ -64,7 +64,7 @@ Follow the prompts to set up an admin user.
 ```bash
 python manage.py runserver
 ```
-Access the application at `http://127.0.0.1:8000/`
+Access the application at `http://127.0.0.1:2222/`
 
 ## Usage
 - **Upload PDFs**: Use the web interface to upload PDF files.
