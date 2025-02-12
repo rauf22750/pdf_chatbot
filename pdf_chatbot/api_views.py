@@ -13,27 +13,26 @@ from django.http import JsonResponse
 
 logger = logging.getLogger(__name__)
 
-# Login API
+# 📌 **User Login API**
 @api_view(['POST'])
 def login_api(request):
     username = request.data.get('username')
     password = request.data.get('password')
-    
+
     if not username or not password:
         logger.error("Login failed: Missing username or password")
         return Response({'error': 'Username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
 
     user = authenticate(request, username=username, password=password)
-    if user is not None:
+    if user:
         login(request, user)
-        return Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
+        token, _ = Token.objects.get_or_create(user=user)  # Generate token
+        return Response({'message': 'Login successful', 'token': token.key}, status=status.HTTP_200_OK)
     
     logger.error(f"Login failed: Invalid credentials for username: {username}")
     return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
-
-
-# Register API
+# 📌 **User Registration API**
 @api_view(['POST'])
 def register_api(request):
     username = request.data.get('username')
@@ -60,109 +59,64 @@ def register_api(request):
 
     try:
         user = CustomUser.objects.create_user(username=username, password=password, email=email)
-        token = Token.objects.create(user=user)  # Create token for the new user
-        return Response({
-            'message': 'Registration successful',
-            'token': token.key  # Return the token to be used in future requests
-        }, status=status.HTTP_201_CREATED)
+        token = Token.objects.create(user=user)  # Generate authentication token
+        return Response({'message': 'Registration successful', 'token': token.key}, status=status.HTTP_201_CREATED)
     except Exception as e:
         logger.error(f"Error during registration: {str(e)}")
         return Response({'error': 'An error occurred. Please try again'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-# Chat API
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from django.http import JsonResponse
-from .utils import generate_response, process_pdf
-from accounts.models import CustomUser, ChatMessage, PDFDocument
-import logging
-
-logger = logging.getLogger(__name__)
-
-# Chat API (POST for messages, GET for fetching chat history)
+# 📌 **Chat API (Send Message & Get Chat History)**
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def chat_api(request):
     if request.method == 'POST':
-        # Get the message from the request data
         message = request.data.get('message')
 
         if not message:
-            return Response({'error': 'Message is required'}, status=400)
+            return Response({'error': 'Message is required'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # Generate the response based on the message
             response = generate_response(message, request.user)
+            chat_message = ChatMessage.objects.create(user=request.user, message=message, response=response)
 
-            # Save the chat message and response to the database
-            chat_message = ChatMessage.objects.create(
-                user=request.user,
-                message=message,
-                response=response
-            )
-
-            return JsonResponse({
-                'response': response,
-                'timestamp': chat_message.timestamp.isoformat()
-            })
-
+            return Response({'response': response, 'timestamp': chat_message.timestamp.isoformat()}, status=status.HTTP_200_OK)
         except Exception as e:
-            return JsonResponse({'error': f"Internal Server Error: {str(e)}"}, status=500)
+            logger.error(f"Chat error: {str(e)}")
+            return Response({'error': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     elif request.method == 'GET':
-        # Fetch all chat history for the authenticated user
         chat_history = ChatMessage.objects.filter(user=request.user).order_by('-timestamp')
+        chat_data = [{'message': chat.message, 'response': chat.response, 'timestamp': chat.timestamp.isoformat()} for chat in chat_history]
 
-        # If no chat history exists
-        if not chat_history.exists():
-            logger.info(f"User {request.user.username} has no chat history.")
-        
-        chat_data = [
-            {
-                'message': chat.message,
-                'response': chat.response,
-                'timestamp': chat.timestamp.isoformat()
-            }
-            for chat in chat_history
-        ]
+        return Response({'chat_history': chat_data}, status=status.HTTP_200_OK)
 
-        logger.info(f"Chat history for user {request.user.username}: {chat_data}")
-
-        return JsonResponse({
-            'chat_history': chat_data
-        })
-# PDF Upload API (Save PDF and process)
+# 📌 **PDF Upload API**
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def upload_pdf(request):
-    if request.method == 'POST' and 'file' in request.FILES:
-        pdf_file = request.FILES['file']
+    if 'file' not in request.FILES:
+        return Response({'error': 'No file uploaded'}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            # Save the PDF document in the model
-            pdf_doc = PDFDocument.objects.create(user=request.user, file=pdf_file)
+    pdf_file = request.FILES['file']
+    
+    try:
+        pdf_doc = PDFDocument.objects.create(user=request.user, file=pdf_file)
+        process_pdf(pdf_doc)  # Process PDF (Extract text, generate vectors, etc.)
 
-            # Optionally, process the PDF (e.g., extract text, tables, etc.)
-            process_pdf(pdf_doc)  # Add your PDF processing logic here
+        return Response({
+            'message': 'PDF uploaded successfully!',
+            'pdf_id': pdf_doc.id,
+            'pdf_name': pdf_doc.file.name,
+            'pdf_url': pdf_doc.file.url
+        }, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        logger.error(f"Error uploading PDF: {str(e)}")
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-            return JsonResponse({
-                'message': 'PDF uploaded successfully!',
-                'pdf_id': pdf_doc.id,
-                'pdf_name': pdf_doc.file.name,
-                'pdf_url': pdf_doc.file.url
-            }, status=200)
-        except Exception as e:
-            logger.error(f"Error uploading PDF: {str(e)}")
-            return JsonResponse({'error': str(e)}, status=500)
-
-    else:
-        return JsonResponse({'error': 'No file uploaded or wrong HTTP method'}, status=400)
-
-# Logout API
+# 📌 **User Logout API**
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout_api(request):
+    request.user.auth_token.delete()  # Remove authentication token
     logout(request)
     return Response({'message': 'Logged out successfully'}, status=status.HTTP_200_OK)
