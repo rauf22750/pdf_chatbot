@@ -89,7 +89,6 @@
                     Send
                 </button>
             </form>
-            <div id="chat-response" class="mt-4 p-4 bg-gray-50 rounded hidden"></div>
         </div>
     </div>
 </div>
@@ -100,10 +99,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const chatForm = document.getElementById('chat-form');
     const userInput = document.getElementById('user-input');
-    const chatResponse = document.getElementById('chat-response');
     const chatHistory = document.getElementById('chat-history');
-    const pdfUploadForm = document.getElementById('pdf-upload-form');
-    const pdfList = document.getElementById('pdf-list');
 
     function showTypingIndicator() {
         const typingDiv = document.createElement('div');
@@ -132,95 +128,49 @@ document.addEventListener('DOMContentLoaded', function() {
     chatForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const formData = new FormData(chatForm);
-        const userMessage = userInput.value;
+        const userMessage = userInput.value.trim();
+
+        if (userMessage === '') return; // Prevent empty messages
         
-        // Clear input field immediately after sending
         userInput.value = '';
-        
-        // Show typing indicator
+
         const typingIndicator = showTypingIndicator();
         
         fetch('', {
             method: 'POST',
             body: formData,
-            headers: {
-                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-            }
+            headers: { 'X-CSRFToken': formData.get('csrfmiddlewaretoken') }
         })
         .then(response => response.json())
         .then(data => {
-            // Remove typing indicator
             removeTypingIndicator(typingIndicator);
-            
-            if (data.error) {
-                chatResponse.innerHTML = `<p class="text-red-500">${data.error}</p>`;
-                chatResponse.classList.remove('hidden');
-            } else {
-                // Add new message to chat history
-                const newMessage = document.createElement('div');
-                newMessage.className = 'bg-white p-4 rounded shadow';
-                newMessage.innerHTML = `
-                    <div class="flex flex-col space-y-2">
-                        <div class="flex items-start">
-                            <span class="font-bold text-blue-600 w-16">You:</span>
-                            <p class="flex-1">${userMessage}</p>
-                        </div>
-                        <div class="flex items-start">
-                            <span class="font-bold text-green-600 w-16">Bot:</span>
-                            <p class="flex-1 whitespace-pre-wrap">${data.response}</p>
-                        </div>
-                        <p class="text-sm text-gray-500 mt-2">${new Date().toLocaleString()}</p>
+
+            const newMessage = document.createElement('div');
+            newMessage.className = 'bg-white p-4 rounded shadow';
+            newMessage.innerHTML = `
+                <div class="flex flex-col space-y-2">
+                    <div class="flex items-start">
+                        <span class="font-bold text-blue-600 w-16">You:</span>
+                        <p class="flex-1">${userMessage}</p>
                     </div>
-                `;
-                chatHistory.appendChild(newMessage);
-                chatHistory.scrollTop = chatHistory.scrollHeight;
-                
-                // Clear chat response area
-                chatResponse.classList.add('hidden');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            chatResponse.innerHTML = '<p class="text-red-500">An error occurred while sending the message.</p>';
-            chatResponse.classList.remove('hidden');
+                    <div class="flex items-start">
+                        <span class="font-bold text-green-600 w-16">Bot:</span>
+                        <p class="flex-1 whitespace-pre-wrap">${data.response}</p>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-2">${new Date().toLocaleString()}</p>
+                </div>
+            `;
+            chatHistory.appendChild(newMessage);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
         });
     });
 
-    // PDF Upload Form Submission
-    if (pdfUploadForm) {
-        pdfUploadForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(pdfUploadForm);
-            
-            fetch('', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    alert(data.error);
-                } else {
-                    alert('PDF uploaded successfully!');
-                    // Add the new PDF to the list
-                    const newPdf = document.createElement('li');
-                    newPdf.className = 'bg-gray-50 p-3 rounded shadow hover:shadow-md flex items-center justify-between';
-                    newPdf.innerHTML = `
-                        <span class="text-blue-500 font-bold truncate">${data.pdf_name}</span>
-                        <a href="${data.pdf_url}" target="_blank" class="text-sm text-blue-600 hover:underline">Open</a>
-                    `;
-                    pdfList.appendChild(newPdf);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error uploading PDF');
-            });
-        });
-    }
+    userInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' && !event.shiftKey) { 
+            event.preventDefault(); 
+            chatForm.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+        }
+    });
 });
 </script>
 {% endblock %}
