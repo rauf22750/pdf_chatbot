@@ -81,11 +81,11 @@ WSGI_APPLICATION = 'pdf_chatbot.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'railway',  # Database name
-        'USER': 'postgres',  # Username
-        'PASSWORD': 'QRSaWneUcHEHPJqhZFNwvikJMEbpzvXa',  # Replace with your actual password
-        'HOST': 'autorack.proxy.rlwy.net',  # Remote host
-        'PORT': '13367',  # Port number
+        'NAME': os.getenv('DB_NAME', 'railway'),
+        'USER': os.getenv('DB_USER', 'postgres'),
+        'PASSWORD': os.getenv('DB_PASSWORD', ''),
+        'HOST': os.getenv('DB_HOST', 'autorack.proxy.rlwy.net'),
+        'PORT': os.getenv('DB_PORT', '13367'),
     }
 }
 
