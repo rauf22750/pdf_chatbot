@@ -1,6 +1,5 @@
-import logging
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes , authentication_classes
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate, login, logout
@@ -8,15 +7,9 @@ from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from accounts.models import CustomUser, PDFDocument, ChatMessage
 from .utils import process_pdf, generate_response
-from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.authtoken.models import Token
-from .utils import generate_response
 import logging
 
 logger = logging.getLogger(__name__)
