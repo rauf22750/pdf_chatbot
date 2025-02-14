@@ -10,6 +10,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from accounts.models import CustomUser, PDFDocument, ChatMessage
 from .utils import process_pdf, generate_response
+from django.views.decorators.csrf import csrf_exempt
 
 logger = logging.getLogger(__name__)
 
@@ -74,6 +75,7 @@ def register(request):
 # Chat view (with PDF upload and chat history)
 @login_required
 @require_http_methods(["GET", "POST"])
+@csrf_exempt
 def chat_view(request):
     pdfs = PDFDocument.objects.filter(user=request.user)
     chat_history = ChatMessage.objects.filter(user=request.user)
