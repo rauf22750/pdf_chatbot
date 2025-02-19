@@ -87,12 +87,12 @@ def chat_view(request):
                 # logger.info(f"Processing uploaded PDF: {pdf.name}")
                 pdf_doc = PDFDocument.objects.create(user=request.user, file=pdf)
                 process_pdf(pdf_doc)  # Assuming process_pdf handles PDF processing
-                return JsonResponse({
-                    'message': 'PDF processed successfully',
-                    'pdf_id': pdf_doc.id,
-                    'pdf_name': pdf_doc.file.name,
-                    'pdf_url': pdf_doc.file.url
-                })
+                # return JsonResponse({
+                #     'message': 'PDF processed successfully',
+                #     'pdf_id': pdf_doc.id,
+                #     'pdf_name': pdf_doc.file.name,
+                #     'pdf_url': pdf_doc.file.url
+                # })
             except Exception as e:
                 # logger.error(f"Error processing PDF: {str(e)}")
                 return JsonResponse({'error': str(e)}, status=500)
