@@ -122,7 +122,6 @@ client = groq.Client(api_key=GROQ_API_KEY)
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
     'https://localhost:8000',
-    'https://pdf-chatbot.vercel.app/',
     'https://pdfai.skylinxtech.co'
 ]
 
