@@ -84,7 +84,7 @@ def chat_view(request):
         if 'file' in request.FILES:
             pdf = request.FILES['file']
             try:
-                logger.info(f"Processing uploaded PDF: {pdf.name}")
+                # logger.info(f"Processing uploaded PDF: {pdf.name}")
                 pdf_doc = PDFDocument.objects.create(user=request.user, file=pdf)
                 process_pdf(pdf_doc)  # Assuming process_pdf handles PDF processing
                 return JsonResponse({
@@ -94,7 +94,7 @@ def chat_view(request):
                     'pdf_url': pdf_doc.file.url
                 })
             except Exception as e:
-                logger.error(f"Error processing PDF: {str(e)}")
+                # logger.error(f"Error processing PDF: {str(e)}")
                 return JsonResponse({'error': str(e)}, status=500)
         else:
             message = request.POST.get('message')
@@ -102,7 +102,7 @@ def chat_view(request):
             
             try:
                 pdf_doc = PDFDocument.objects.get(id=pdf_id) if pdf_id else None
-                logger.info(f"Generating response for message: {message}")
+                # logger.info(f"Generating response for message: {message}")
                 response = generate_response(message, request.user)
                 chat_message = ChatMessage.objects.create(
                     user=request.user,
@@ -115,7 +115,7 @@ def chat_view(request):
                     'timestamp': chat_message.timestamp.isoformat()
                 })
             except Exception as e:
-                logger.error(f"Error generating response: {str(e)}")
+                # logger.error(f"Error generating response: {str(e)}")
                 return JsonResponse({'error': str(e)}, status=500)
 
     return render(request, 'chat/chat.html', {
