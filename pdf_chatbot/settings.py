@@ -14,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Security settings
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 DEBUG = os.environ.get('DEBUG')
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.ngrok-free.app', '.vercel.app','https://pdfai.skylinxtech.co']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1','https://pdfai.skylinxtech.co']
 
 # Applications definition
 INSTALLED_APPS = [
