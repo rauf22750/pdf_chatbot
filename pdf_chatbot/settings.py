@@ -7,7 +7,7 @@ import nltk
 
 # Load environment variables from .env file
 load_dotenv()
-
+# NLTK_DATA_DIR = r"C:\Users\Mughal\Desktop\pdf_chatbot-1\nltk_data"
 # Base directory of the project
 BASE_DIR = Path(__file__).resolve().parent.parent
 
