@@ -27,7 +27,7 @@ from django.conf.urls.static import static
 from rest_framework.authtoken import views as auth_views
 from pdf_chatbot import api_views
 urlpatterns = [
-    path('login/', views.login_view, name='login'),
+    path('accounts/login/', views.login_view, name='login'),
     path('register/', views.register, name='register'),
     path('', views.chat_view, name='chat'),
     path('logout/', views.logout_view, name='logout'),

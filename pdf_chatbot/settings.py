@@ -4,6 +4,9 @@ import dj_database_url
 from dotenv import load_dotenv
 import groq
 from datetime import timedelta
+import nltk
+nltk.download('punkt')
+
 
 # Load environment variables from .env file
 load_dotenv()
