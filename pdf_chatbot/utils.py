@@ -16,16 +16,29 @@ from accounts.models import PDFDocument
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Download necessary NLTK data
-nltk.download('punkt', quiet=True)
-
-# Define paths using settings
+# ✅ Set custom NLTK data directory
 BASE_DIR = Path(__file__).resolve().parent.parent
+NLTK_DATA_DIR = BASE_DIR / "nltk_data"
+
+# Ensure the directory exists
+os.makedirs(NLTK_DATA_DIR, exist_ok=True)
+
+# Add to nltk data path
+nltk.data.path.append(str(NLTK_DATA_DIR))
+
+# Download 'punkt' if not available
+try:
+    nltk.data.find("tokenizers/punkt")
+except LookupError:
+    logger.info("Downloading NLTK 'punkt' tokenizer...")
+    nltk.download("punkt", download_dir=str(NLTK_DATA_DIR))
+
+# ✅ Define paths
 MEDIA_DIR = BASE_DIR / "media"
 PDF_DIR = MEDIA_DIR / "pdfs"
 FAISS_INDEX_DIR = MEDIA_DIR / "faiss_indexes"
 
-# Ensure directories exist
+# Ensure necessary directories exist
 PDF_DIR.mkdir(parents=True, exist_ok=True)
 FAISS_INDEX_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -38,7 +51,7 @@ def process_pdf(pdf_document):
 
     logger.info(f"Processing PDF: {pdf_path}")
     
-    # Read PDF text
+    # ✅ Read PDF text
     try:
         pdf_reader = PyPDF2.PdfReader(pdf_path)
         text = "".join(page.extract_text() or "" for page in pdf_reader.pages)
@@ -50,7 +63,7 @@ def process_pdf(pdf_document):
 
     logger.info(f"Extracted {len(text)} characters from the PDF")
     
-    # Split text into chunks
+    # ✅ Split text into chunks
     sentences = sent_tokenize(text)
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     chunks = text_splitter.split_text(" ".join(sentences))
@@ -60,13 +73,13 @@ def process_pdf(pdf_document):
 
     logger.info(f"Split text into {len(chunks)} chunks")
 
-    # Generate embeddings and store in FAISS
+    # ✅ Generate embeddings and store in FAISS
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     vector_store = FAISS.from_texts(chunks, embeddings)
     
     logger.info("Created FAISS vector store")
     
-    # Save FAISS index
+    # ✅ Save FAISS index
     index_path = FAISS_INDEX_DIR / f"faiss_index_{pdf_document.id}"
     vector_store.save_local(str(index_path))
     
@@ -92,20 +105,20 @@ def generate_response(user_input, context=None):
     if not vector_stores:
         raise ValueError("No vector stores found!")
 
-    # Merge all FAISS vector stores
+    # ✅ Merge all FAISS vector stores
     main_vector_store = vector_stores[0]
     for vs in vector_stores[1:]:
         main_vector_store.merge_from(vs)
 
-    # Set up memory for conversational chain
+    # ✅ Set up memory for conversational chain
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
     
-    # Ensure API key is available
+    # ✅ Ensure API key is available
     groq_api_key = os.environ.get("GROQ_API_KEY")
     if not groq_api_key:
         raise ValueError("GROQ_API_KEY environment variable is not set.")
 
-    # Initialize Groq client for the language model
+    # ✅ Initialize Groq client for the language model
     llm = ChatGroq(
         groq_api_key=groq_api_key,
         model_name="llama3-70b-8192",
@@ -113,7 +126,7 @@ def generate_response(user_input, context=None):
         max_tokens=1000,
     )
 
-    # Create conversational retrieval chain
+    # ✅ Create conversational retrieval chain
     qa = ConversationalRetrievalChain.from_llm(
         llm=llm,
         retriever=main_vector_store.as_retriever(search_kwargs={"k": 5}),
