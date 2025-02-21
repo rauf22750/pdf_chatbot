@@ -3,10 +3,7 @@ from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
 import groq
-from datetime import timedelta
 import nltk
-nltk.download('punkt')
-
 
 # Load environment variables from .env file
 load_dotenv()
@@ -15,11 +12,11 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Security settings
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
-DEBUG = os.environ.get('DEBUG')
-ALLOWED_HOSTS = ['localhost', '127.0.0.1','https://pdfai.skylinxtech.co']
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')  # Ensure a default is provided for safety
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'  # Convert to boolean
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,pdfai.skylinxtech.co').split(',')
 
-# Applications definition
+# Installed applications
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -31,19 +28,17 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'rest_framework',
     'rest_framework.authtoken',
-    'corsheaders',  # Add this
-    'whitenoise'
+    'corsheaders',
+    'whitenoise.runserver_nostatic',  # Optimize static file handling
 ]
 
 # Middleware
 MIDDLEWARE = [
-    # ... other middleware ...
-    'pdf_chatbot.middleware.CSRFExemptMiddleware',  # Add this line
-    # ... other middleware ...
-    'django.middleware.security.SecurityMiddleware', 
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'pdf_chatbot.middleware.CSRFExemptMiddleware',  # Custom CSRF exemption
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Optimize static files
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  # Add this at the top
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -51,14 +46,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# URL routing
+# URL configuration
 ROOT_URLCONF = 'pdf_chatbot.urls'
 
 # Templates
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -73,13 +68,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'pdf_chatbot.wsgi.application'
 
-# Database settings (SQLite or PostgreSQL)
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+# Database settings (PostgreSQL)
 
 DATABASES = {
     'default': {
@@ -93,7 +82,7 @@ DATABASES = {
 }
 
 
-# Password validation
+# Authentication and user model
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -101,60 +90,64 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+AUTH_USER_MODEL = 'accounts.CustomUser'
+
 # Localization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files
+# Static & media files
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # Corrected
 
-# Media files
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-STATICSTORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# NLTK settings (Set a writable directory for live server)
+NLTK_DATA_DIR = BASE_DIR / "nltk_data"
+os.makedirs(NLTK_DATA_DIR, exist_ok=True)
+nltk.data.path.append(str(NLTK_DATA_DIR))
+
+try:
+    nltk.data.find("tokenizers/punkt")
+except LookupError:
+    nltk.download("punkt", download_dir=str(NLTK_DATA_DIR), quiet=True)
 
 # Groq API settings
 GROQ_API_KEY = os.getenv('GROQ_API_KEY')
 client = groq.Client(api_key=GROQ_API_KEY)
 
-# CSRF settings for development
+# Security settings
+SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', 'False') == 'True'
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# CSRF & session settings
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:8000',
     'https://localhost:8000',
     'https://pdfai.skylinxtech.co'
 ]
+CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
 
-# CSRF and session settings
-CSRF_COOKIE_SECURE = False
-SESSION_COOKIE_SECURE = False
-SECURE_SSL_REDIRECT = False
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# Cross-Origin Resource Sharing (CORS)
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    'https://pdfai.skylinxtech.co',
+]
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True  # Only for development!
 
-# Custom user model
-AUTH_USER_MODEL = 'accounts.CustomUser'
-
-# Login redirect URL
-LOGIN_REDIRECT_URL = 'chat'
-LOGOUT_REDIRECT_URL = 'login'
-
-# Directories for PDFs and FAISS indexes
-PDF_DIR = os.path.join(MEDIA_ROOT, 'pdfs')
-FAISS_INDEX_DIR = os.path.join(MEDIA_ROOT, 'faiss_indexes')
-os.makedirs(PDF_DIR, exist_ok=True)
-os.makedirs(FAISS_INDEX_DIR, exist_ok=True)
-
-# Default primary key field type
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-
-
-
-# ... (existing settings)
+# CSRF Exemption URLs (Regex patterns)
+CSRF_EXEMPT_URLS = [
+    r'^api/login/$',
+    r'^api/register/$',
+    r'^api/chat/$',
+    r'^api/upload_pdf/$',
+]
 
 # Django Rest Framework settings
 REST_FRAMEWORK = {
@@ -167,16 +160,14 @@ REST_FRAMEWORK = {
     ],
 }
 
-# Token expiration time (optional)
+# Token expiration settings
 TOKEN_EXPIRED_AFTER_SECONDS = 86400  # 24 hours
-CORS_ALLOW_ALL_ORIGINS = True  # For development only, restrict this in production
-# Add this setting to exempt CSRF checks for certain URLs
-CSRF_EXEMPT_URLS = [
-    r'^api/login/$',
-    r'^api/register/$',
-    r'^api/chat/$',
-    r'^api/upload_pdf/$',
 
-    # Add other API URLs that should be exempt from CSRF
-]
+# PDF & FAISS directories (ensure they exist)
+PDF_DIR = MEDIA_ROOT / "pdfs"
+FAISS_INDEX_DIR = MEDIA_ROOT / "faiss_indexes"
+os.makedirs(PDF_DIR, exist_ok=True)
+os.makedirs(FAISS_INDEX_DIR, exist_ok=True)
 
+# Default primary key field type
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
