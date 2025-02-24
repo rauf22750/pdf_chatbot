@@ -7,14 +7,16 @@ import nltk
 
 # Load environment variables from .env file
 load_dotenv()
-# NLTK_DATA_DIR = r"C:\Users\Mughal\Desktop\pdf_chatbot-1\nltk_data"
+
 # Base directory of the project
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Security settings
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')  # Ensure a default is provided for safety
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'  # Convert to boolean
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,pdfai.skylinxtech.co').split(',')
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')  # Ensure a default value
+DEBUG = os.getenv('DEBUG')  # Convert to boolean
+
+# Allowed hosts
+ALLOWED_HOSTS = ('ALLOWED_HOSTS', 'localhost','127.0.0.1','pdfai.skylinxtech.co','*')
 
 # Installed applications
 INSTALLED_APPS = [
@@ -69,7 +71,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'pdf_chatbot.wsgi.application'
 
 # Database settings (PostgreSQL)
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -80,7 +81,6 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT', '13367'),
     }
 }
-
 
 # Authentication and user model
 AUTH_PASSWORD_VALIDATORS = [
@@ -102,12 +102,16 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # Corrected
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # Optimized for deployment
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# NLTK settings (Set a writable directory for live server)
+# Ensure media directories exist
+os.makedirs(MEDIA_ROOT / "pdfs", exist_ok=True)
+os.makedirs(MEDIA_ROOT / "faiss_indexes", exist_ok=True)
+
+# NLTK settings (Ensure a writable directory)
 NLTK_DATA_DIR = BASE_DIR / "nltk_data"
 os.makedirs(NLTK_DATA_DIR, exist_ok=True)
 nltk.data.path.append(str(NLTK_DATA_DIR))
@@ -118,12 +122,12 @@ except LookupError:
     nltk.download("punkt", download_dir=str(NLTK_DATA_DIR), quiet=True)
 
 # Groq API settings
-GROQ_API_KEY = os.getenv('GROQ_API_KEY')
+GROQ_API_KEY = os.getenv('GROQ_API_KEY', '')
 client = groq.Client(api_key=GROQ_API_KEY)
 
 # Security settings
 SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', 'False') == 'True'
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') if not DEBUG else None
 
 # CSRF & session settings
 CSRF_TRUSTED_ORIGINS = [
@@ -163,11 +167,8 @@ REST_FRAMEWORK = {
 # Token expiration settings
 TOKEN_EXPIRED_AFTER_SECONDS = 86400  # 24 hours
 
-# PDF & FAISS directories (ensure they exist)
-PDF_DIR = MEDIA_ROOT / "pdfs"
-FAISS_INDEX_DIR = MEDIA_ROOT / "faiss_indexes"
-os.makedirs(PDF_DIR, exist_ok=True)
-os.makedirs(FAISS_INDEX_DIR, exist_ok=True)
-
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Serve media files during development
+
