@@ -34,7 +34,7 @@ urlpatterns = [
     path('api/chat/', api_views.chat_api, name='chat_api'),
     path('api/upload_pdf/', api_views.upload_pdf, name='upload_pdf_api'),
     path('api/logout/', api_views.logout_api, name='logout_api'),
-    
+
 ]
 
 if settings.DEBUG:
