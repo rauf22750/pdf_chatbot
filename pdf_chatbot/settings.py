@@ -1,8 +1,6 @@
 import os
 from pathlib import Path
-import dj_database_url
 from dotenv import load_dotenv
-import groq
 import nltk
 
 # Load environment variables from .env file
@@ -123,7 +121,6 @@ except LookupError:
 
 # Groq API settings
 GROQ_API_KEY = os.getenv('GROQ_API_KEY', '')
-client = groq.Client(api_key=GROQ_API_KEY)
 
 # Security settings
 SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', 'False') == 'True'
