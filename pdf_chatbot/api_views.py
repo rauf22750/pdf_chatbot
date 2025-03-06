@@ -122,7 +122,7 @@ def upload_pdf(request):
     except Exception as e:
         logger.error(f"Error uploading PDF: {str(e)}")
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+   
 @csrf_exempt
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
