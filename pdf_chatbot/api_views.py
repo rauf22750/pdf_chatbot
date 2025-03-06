@@ -127,7 +127,10 @@ def upload_pdf(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout_api(request):
-    request.auth.delete()
+    if request.auth:
+        request.auth.delete()
+    elif hasattr(request.auth , 'auth_token'):
+        request.user.auth_token.delete()
     logout(request)
     return Response({'message': 'Logged out successfully'}, status=status.HTTP_200_OK)
 
